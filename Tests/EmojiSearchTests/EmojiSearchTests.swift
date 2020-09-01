@@ -17,10 +17,7 @@ final class EmojiSearchTests: XCTestCase {
         // it's an ordered list of closest match
         XCTAssertEqual(emojiSearch.search(for: "in", limit: 2), [expressionless, grinning])
         XCTAssertEqual(emojiSearch.search(for: "in"), [expressionless, grinning, grimacing])
-        
         XCTAssertEqual(emojiSearch.search(for: ":)"), [grinning])
-        
-        // NOTE: not sure why expressionless is in this list
-        XCTAssertEqual(emojiSearch.search(for: "smi"), [grinning, expressionless])
+        XCTAssertEqual(emojiSearch.search(for: "smi"), [grinning])
     }
 }

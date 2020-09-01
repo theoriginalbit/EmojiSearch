@@ -9,7 +9,14 @@ final class EmojiSearchTests: XCTestCase {
         }
         
         let searchProvider = EmojiSearch(dataSource: database)
-        print(searchProvider.search(for: "snail", limit: 10))
-        print("####")
+        
+        XCTAssertEqual(try XCTUnwrap(searchProvider.search(for: "snail", limit: 1).first).char, "🐌")
+        XCTAssertEqual(try XCTUnwrap(searchProvider.search(for: "smile", limit: 1).first).char, "😃")
+        XCTAssertEqual(try XCTUnwrap(searchProvider.search(for: "strong", limit: 1).first).char, "💪")
+        XCTAssertEqual(try XCTUnwrap(searchProvider.search(for: "dog", limit: 1).first).char, "🐶")
     }
+}
+
+extension EmojiModel: CustomStringConvertible {
+    public var description: String { char }
 }
