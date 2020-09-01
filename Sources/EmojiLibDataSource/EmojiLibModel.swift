@@ -1,6 +1,6 @@
 import EmojiSearch
 
-public struct EmojiModel: EmojiDefinition {
+public struct EmojiLibModel: EmojiDefinition {
     public let name: String
     public let keywords: [String]
     public let char: String

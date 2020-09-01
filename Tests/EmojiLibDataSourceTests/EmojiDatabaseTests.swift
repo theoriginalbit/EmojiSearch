@@ -1,10 +1,10 @@
 import XCTest
-@testable import EmojiDatabase
+@testable import EmojiLibDataSource
 import EmojiSearch
 
 final class EmojiSearchTests: XCTestCase {
     func testEmojiDatabase() {
-        guard let database = EmojiDatabase() else {
+        guard let database = EmojiLibDataSource() else {
             return XCTFail("Unable to construct database")
         }
         
@@ -17,6 +17,6 @@ final class EmojiSearchTests: XCTestCase {
     }
 }
 
-extension EmojiModel: CustomStringConvertible {
+extension EmojiLibModel: CustomStringConvertible {
     public var description: String { char }
 }

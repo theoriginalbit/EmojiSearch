@@ -9,7 +9,7 @@ let package = Package(
     ],
     products: [
         .library(name: "EmojiSearch", targets: ["EmojiSearch"]),
-        .library(name: "EmojiDatabase", targets: ["EmojiDatabase"])
+        .library(name: "EmojiLibDataSource", targets: ["EmojiLibDataSource"])
     ],
     dependencies: [
         .package(name: "Fuse", url: "https://github.com/krisk/fuse-swift.git", .upToNextMinor(from: "1.4.0")),
@@ -20,10 +20,10 @@ let package = Package(
         .testTarget(name: "EmojiSearchTests",
                     dependencies: ["EmojiSearch"]),
         
-        .target(name: "EmojiDatabase",
+        .target(name: "EmojiLibDataSource",
                 dependencies: [.target(name: "EmojiSearch")],
                 resources: [.copy("emojis.json")]),
-        .testTarget(name: "EmojiDatabaseTests",
-                    dependencies: ["EmojiDatabase"]),
+        .testTarget(name: "EmojiLibDataSourceTests",
+                    dependencies: ["EmojiLibDataSource"]),
     ]
 )
