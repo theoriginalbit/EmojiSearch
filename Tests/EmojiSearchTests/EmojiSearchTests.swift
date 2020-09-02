@@ -5,7 +5,7 @@ final class EmojiSearchTests: XCTestCase {
     func testEmojiSearch() {
         let grinning = Emoji(terms: "grinning", "face", "smile", "happy", ":)")
         let grimacing = Emoji(terms: "grimacing", "face", "grimace", "teeth")
-        let expressionless = Emoji(terms: "expressionless", "face", "indifferent", "-_-", "meh", "deadpan")
+        let expressionless = Emoji(terms: "expressionless", "indifferent", "-_-", "meh", "deadpan")
         
         let emojis: [Emoji] = [grinning, grimacing, expressionless]
         let dataSource = MockEmojiDataSource(emojis: emojis)
@@ -16,8 +16,9 @@ final class EmojiSearchTests: XCTestCase {
         
         // it's an ordered list of closest match
         XCTAssertEqual(emojiSearch.search(for: "in", limit: 2), [expressionless, grinning])
-        XCTAssertEqual(emojiSearch.search(for: "in"), [expressionless, grinning, grimacing])
+        XCTAssertEqual(emojiSearch.search(for: "in"), [expressionless])
         XCTAssertEqual(emojiSearch.search(for: ":)"), [grinning])
         XCTAssertEqual(emojiSearch.search(for: "smi"), [grinning])
+        XCTAssertEqual(emojiSearch.search(for: "face"), [grinning, grimacing])
     }
 }

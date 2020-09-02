@@ -30,7 +30,7 @@ class MockSearchProvider: EmojiSearchProvider {
             return 1.0
         }
         if source.hasPrefix(term) {
-            return 0.7
+            return 1.0
         }
         if source.contains(term) {
             return 0.5

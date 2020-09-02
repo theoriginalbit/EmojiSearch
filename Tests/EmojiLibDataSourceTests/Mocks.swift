@@ -9,8 +9,14 @@ class MockSearchProvider: EmojiSearchProvider {
         if term == source {
             return 1.0
         }
+        if source.hasPrefix(term) {
+            return 1.0
+        }
         if source.contains(term) {
             return 0.5
+        }
+        if source.hasSuffix(term) {
+            return 0.3
         }
         return 0.0
     }

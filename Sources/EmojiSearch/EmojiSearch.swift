@@ -37,11 +37,9 @@ public struct EmojiSearch<SearchProvider: EmojiSearchProvider, DataSource: Emoji
     ///   - limit: the maximum number of items to return
     /// - Returns: the emojis that match the search term
     public func search(for search: String, limit: Int? = nil) -> [DataSource.Emoji] {
-        let limit = limit ?? dataSource.emojis.count
-        
         // Improve performance by creating the fuse pattern up front, returning all emojis if the pattern is invalid
         guard let term = searchProvider.compileSearchTerm(from: search) else {
-            return Array(dataSource.emojis.prefix(limit))
+            return Array(dataSource.emojis.prefix(limit ?? dataSource.emojis.count))
         }
         
         /// A function that finds the best matching search term for the supplied emoji, this may not be the best
@@ -54,10 +52,18 @@ public struct EmojiSearch<SearchProvider: EmojiSearchProvider, DataSource: Emoji
         }
         
         // Search baby search
-        return dataSource.emojis
+        let rankedEmojis = dataSource.emojis
             .compactMap(bestMatch(in:))
             .sorted(by: \.score, order: .descending)
-            .prefix(limit)
+        
+        return prefixOrBestMatches(upTo: limit, in: rankedEmojis)
             .map { $0.emoji }
+    }
+    
+    private func prefixOrBestMatches(upTo maxLength: Int? = nil, in results: [SearchResult]) -> [SearchResult] {
+        guard let maxLength = maxLength else {
+            return results.filter { $0.score == 1.0 }
+        }
+        return Array(results.prefix(maxLength))
     }
 }
