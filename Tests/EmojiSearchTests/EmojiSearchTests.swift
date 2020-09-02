@@ -9,7 +9,7 @@ final class EmojiSearchTests: XCTestCase {
         
         let emojis: [Emoji] = [grinning, grimacing, expressionless]
         let dataSource = MockEmojiDataSource(emojis: emojis)
-        let emojiSearch = EmojiSearch(dataSource: dataSource)
+        let emojiSearch = EmojiSearch(searchProvider: MockSearchProvider(), dataSource: dataSource)
         
         // "in" is at the start of "indifferent" within "expressionless"
         XCTAssertEqual(emojiSearch.search(for: "in", limit: 1), [expressionless])

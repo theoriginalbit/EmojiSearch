@@ -1,21 +1,32 @@
 import Foundation
-import Fuse
 
-public struct EmojiSearch<DataSource: EmojiDataSource> {
-    private typealias SearchResult = (emoji: DataSource.Emoji, score: Double)
+/// <#Description#>
+public struct EmojiSearch<SearchProvider: EmojiSearchProvider, DataSource: EmojiDataSource> {
+    struct SearchResult {
+        let emoji: DataSource.Emoji
+        let score: Double
+        
+        init?(emoji: DataSource.Emoji, score: Double) {
+            guard 0.0 ... 1.0 ~= score else {
+                assertionFailure("SearchProvider has supplied score outside of required 0...1 range")
+                return nil
+            }
+            self.emoji = emoji
+            self.score = score
+        }
+    }
     
     private let dataSource: DataSource
-    private let fuse: Fuse
+    private let searchProvider: SearchProvider
         
     /// Creates a new emoji search with the provided options
     ///
     /// - Parameters:
+    ///   - searchProvider: <#searchProvider description#>
     ///   - dataSource: the source to retreive the emoji data
-    ///   - searchThreshold: the cutoff threshold for searching, the lower the number the closer the match.
-    ///   The higher the value the longer the search will take. The default value is `0.1`.
-    public init(dataSource: DataSource, searchThreshold threshold: Double = 0.1) {
+    public init(searchProvider: SearchProvider, dataSource: DataSource) {
+        self.searchProvider = searchProvider
         self.dataSource = dataSource
-        self.fuse = Fuse(threshold: threshold)
     }
     
     /// Search the emoji data source for any emojis matching the supplied search string, up to the provided limit or all
@@ -29,25 +40,23 @@ public struct EmojiSearch<DataSource: EmojiDataSource> {
         let limit = limit ?? dataSource.emojis.count
         
         // Improve performance by creating the fuse pattern up front, returning all emojis if the pattern is invalid
-        guard let pattern = fuse.createPattern(from: search) else { return Array(dataSource.emojis.prefix(limit)) }
+        guard let term = searchProvider.compileSearchTerm(from: search) else {
+            return Array(dataSource.emojis.prefix(limit))
+        }
         
         /// A function that finds the best matching search term for the supplied emoji, this may not be the best
         /// term for the pattern, but it's the best term for **this** emoji.
         func bestMatch(in emoji: DataSource.Emoji) -> SearchResult? {
             emoji.searchTerms
-                .compactMap {
-                    guard let result = fuse.search(pattern, in: $0) else { return nil }
-                    print(emoji.searchTerms.first!, result.score)
-                    return SearchResult(emoji: emoji, score: result.score)
-                }
-                .sorted(by: \.score, order: .ascending) // the lower the score the better
+                .compactMap { SearchResult(emoji: emoji, score: searchProvider.search(for: term, in: $0)) }
+                .sorted(by: \.score, order: .descending)
                 .first
         }
         
         // Search baby search
         return dataSource.emojis
             .compactMap(bestMatch(in:))
-            .sorted(by: \.score, order: .ascending) // the lower the score the better
+            .sorted(by: \.score, order: .descending)
             .prefix(limit)
             .map { $0.emoji }
     }
